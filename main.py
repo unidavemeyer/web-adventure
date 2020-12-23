@@ -6,10 +6,11 @@ import session
 
 if __name__ == '__main__':
     rooms = layout.Rooms()
-    rooms.Load("example_layout.yml")    # TODO: correct this to be the real deal
+    rooms.Load("game.yml")    # TODO: command line arg to select?
 
     group = session.Group()
-    group.Load()
+    group.Load("sessions")    # TODO: command line arg to select?
+    group.InitRooms(rooms)
 
     server = server.Server()
     server.SetRooms(rooms)
