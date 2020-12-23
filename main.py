@@ -1,6 +1,6 @@
 # front end driver for web-adventure
 
-import http
+import server
 import layout
 import session
 
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     group = session.Group()
     group.Load()
 
-    server = http.Server()
+    server = server.Server()
     server.SetRooms(rooms)
     server.SetGroup(group)
     server.Run()
