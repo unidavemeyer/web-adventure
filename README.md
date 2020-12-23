@@ -42,7 +42,8 @@ the system as shown below.
    variables in them for expansion, as used by python's "format" function, e.g., {var}. Variables will be expanded by pulling
    them from the player's session.
  * Exits (required): Every room must have one or more possible exits. Exits may be conditional (hidden if player doesn't match).
-   Conditions on an exit may compare session variables to other session variables or to constant values.
+   Conditions on an exit may compare session variables to other session variables or to constant values. As with descriptions,
+   exit text will be formatted with session variable expansions applied.
  * Change (optional): Rooms may define one or more changes to apply to the player's session on entry into the room. Changes
    provide simple expressions that can set the value of a session variable, add or subtract something from one, put a ranged
    randomized integer in one, or set to the current time value in seconds. Changes are applied in order of definition prior
