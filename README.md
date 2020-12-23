@@ -38,7 +38,13 @@ in multiple files, where each document defines a single room. Rooms can define s
 the system as shown below.
 
  * Name (required): Every room must have a unique name within the scope of the overall room layout the room belongs to.
- * Description (required): Every room must have a description to display to the player.
+ * Description (required): Every room must have a description to display to the player. Descriptions can contain
+   variables in them for expansion, as used by python's "format" function, e.g., {var}. Variables will be expanded by pulling
+   them from the player's session.
  * Exits (required): Every room must have one or more possible exits. Exits may be conditional (hidden if player doesn't match).
- * Session (optional): Rooms may define changes to apply to the player's session on entry into the room.
+   Conditions on an exit may compare session variables to other session variables or to constant values.
+ * Change (optional): Rooms may define one or more changes to apply to the player's session on entry into the room. Changes
+   provide simple expressions that can set the value of a session variable, add or subtract something from one, put a ranged
+   randomized integer in one, or set to the current time value in seconds. Changes are applied in order of definition prior
+   to generating the description and exits for the room.
 
