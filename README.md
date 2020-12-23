@@ -49,3 +49,4 @@ the system as shown below.
    randomized integer in one, or set to the current time value in seconds. Changes are applied in order of definition prior
    to generating the description and exits for the room.
 
+Examples for how rooms in a room layout can be put together can be found in example\_layout.yml
