@@ -91,12 +91,14 @@ class Server:
         # Set up function tables for handling various POST and GET URLs
 
         self.m_mpPathPost = {
+                "/create" : self.OnPostCreate,
                 "/login" : self.OnPostLogin,
                 "/room" : self.OnPostRoom,
                 }
 
         self.m_mpPathGet = {
                 "/" : self.OnGetLogin,
+                "/create" : self.OnGetCreate,
                 "/favicon.ico" : self.OnGetFavicon,
                 "/login" : self.OnGetLogin,
                 }
@@ -125,7 +127,8 @@ class Server:
 
         # Expectation:
         #  - post data will be URL encoded (i.e., key=value&key=value&...)
-        #  - TODO: can we make this be the case somehow?
+        #  - above should be true since default for form is "enctype=application/x-www-form-urlencoded"
+        #  - NOTE spaces are switched to + and special characters are converted to ASCII HEX
 
         # redirect if we don't understand where the post is
 
@@ -160,12 +163,6 @@ class Server:
     def OnRedirectLogin(self, handler):
         # generate 303 return sending people to GET the /login endpoint
 
-        # TODO: include Content-Length
-
-        handler.send_response(303)
-        handler.send_header('Location', '/login')
-        handler.end_headers()
-
         lStr = [
                 '<html>',
                 '<body>',
@@ -174,27 +171,156 @@ class Server:
                 '</body>',
                 '</html>',
             ]
+        strOut = '\n'.join(lStr)
+        abOut = strOut.encode()
 
-        for str0 in lStr:
-            handler.wfile.write(str0.encode())
-            handler.wfile.write('\n'.encode())
+        handler.send_response(303)
+        handler.send_header('Location', '/login')
+        handler.send_header('Content-Length', len(abOut))
+        handler.end_headers()
+
+        handler.wfile.write(abOut)
+
+    def OnCreateError(self, handler, strErr):
+        """Provide error page to the user in response to bad user create attempts"""
+
+        lStr = [
+                '<html>',
+                '<head><title>Create User Error</title></head>',
+                '<body>',
+                '<h1>Oops!</h1>',
+                '<p>The user could not be created: {err}</p>'.format(err=strErr),
+                '<p>You could <a href="/create">try again</a> if you wish.</p>',
+                '<p>You could <a href="/login">log in</a> if you remember your username and password.</p>',
+                '</body>',
+                '</html>',
+            ]
+        strOut = '\n'.join(lStr)
+        abOut = strOut.encode()
+
+        handler.send_response(200)
+        handler.send_header('Content-Length', len(abOut))
+        handler.end_headers()
+
+        handler.wfile.write(abOut)
+
+    def OnPostCreate(self, handler, dPost):
+        """Handles attempts to create a new account"""
+
+        # filter out invalid usernames
+
+        uid = dPost.get('login')
+        if uid is None or uid == '':
+            self.OnCreateError(handler, "Invalid username")
+            return
+
+        setCh = set(list(uid))
+        setChValid = set(list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'))
+
+        if setCh & setChValid != setCh:
+            self.OnCreateError(handler, "Invalid characters in username")
+            return
+
+        # filter out duplicated usernames
+
+        sessionPrev = self.m_group.SessionFromUid(uid)
+        if sessionPrev is not None:
+            self.OnCreateError(handler, "User already exists")
+            return
+
+        pwd1 = dPost.get('pass')
+        pwd2 = dPost.get('pass2')
+
+        # reject illegal passwords
+
+        if pwd1 is None or pwd1 == '':
+            self.OnCreateError(handler, "Invalid password")
+            return
+
+        if len(pwd1) < 4:
+            self.OnCreateError(handler, "Password is too short")
+            return
+
+        # reject non-matching passwords
+
+        if pwd1 != pwd2:
+            self.OnCreateError(handler, "Passwords do not match")
+            return
+
+        # TODO create a session with the given user/password
+
+        # TODO add newly created session to the session group
+
+        # TODO call into OnPostLogin with updated dPost values
+
+        pass
+
+    def OnGetCreate(self, handler):
+        """Page to allow a new player to create a new account"""
+
+        lStr = [
+                '<html>',
+                '<head>New Player</head>',
+                '<body>',
+                '<h1>Create New Player</h1>',
+                '<p>If you would like to play web-adventure you will need to create an account. Please fill in the following fields.</p>',
+                '<form action="/create" method="post">',
+                    '<label for="login">Username:</label>',
+                    '<input type="text" id="login" name="login" autocomplete="off" autofocus maxlength=20 required size=20/>',
+                    '<br/>',
+                    '<label for="pass">Password:</label>',
+                    '<input type="password" id="pass" name="pass" autocomplete="off" autofocus maxlength=20 required size=20/>',
+                    '<br/>',
+                    '<label for="pass2">Password (re entry):</label>',
+                    '<input type="password" id="pass2" name="pass2" autocomplete="off" autofocus maxlength=20 required size=20/>',
+                    '<br/>',
+                    '<input type="submit" value="Go"/>',
+                '</form>',
+                '</body>',
+                '</html>',
+            ]
+        strOut = '\n'.join(lStr)
+        abOut = strOut.encode()
+
+        handler.send_response(200)
+        handler.send_header('Content-Length', len(abOut))
+        handler.end_headers()
+        handler.wfile.write(abOut)
 
     def OnPostLogin(self, handler, dPost):
         """Handle the submit end of attempting to log in"""
 
-        # TODO actually validate, make welcome page, links to go to room, etc.?
-
         handler.send_response(200)
         handler.end_headers()
         
-        lStr = [
-                '<html>',
-                '<body>',
-                '<p>user: "{u}"</p>'.format(u=dPost.get('login', 'MISSING')),
-                '<p>pass: "{p}"</p>'.format(p=dPost.get('pass', 'MISSING')),
-                '</body>',
-                '</html>',
-                ]
+        lStr = []
+        lStr.append('<html>')
+        lStr.append('<body>')
+
+        # DEBUG - show what we got
+        lStr.append('<p>user: "{u}"</p>'.format(u=dPost.get('login', 'MISSING')))
+        lStr.append('<p>pass: "{p}"</p>'.format(p=dPost.get('pass', 'MISSING')))
+
+        # Check if we have a user and password that match. To avoid timing attacks we check
+        #  a session, even if we don't have one with a matching UID.
+
+        sessionCheck = self.m_group.SessionFromUid(dPost.get('login'))
+        if sessionCheck is None:
+            sessionCheck = self.m_group.SessionCreate()
+
+        if not sessionCheck.FMatchesCreds(dPost.get('pass'))
+            lStr.append('<h1>Invalid Login</h1>')
+            lStr.append('<p>The user or password you supplied do not match our records.</p>')
+            lStr.append('<p>You could try to <a href="/login">login again</a> if you would like.</p>')
+            lStr.append('<p>You could also try to <a href="/create">create a new account</a> instead.</p>')
+        else:
+            # TODO
+            # generate sid and map it to this session
+            # send back welcome page of some kind
+            pass
+
+        lStr.append('</body>')
+        lStr.append('</html>')
 
         for str0 in lStr:
             handler.wfile.write(str0.encode())
@@ -218,11 +344,9 @@ class Server:
             self.OnRedirectLogin(handler)
             return
 
-        if 'sid' not in self.m_mpSidSession:
+        if not self.FIsValidSid(dPost['sid']):
             self.OnRedirectLogin(handler)
             return
-
-        # TODO: expired sessions?
 
         handler.send_response(200)
         handler.end_headers()
@@ -247,9 +371,6 @@ class Server:
     def OnGetLogin(self, handler):
         """Provide the initial login page"""
 
-        handler.send_response(200)
-        handler.end_headers()
-
         lStr = [
                 '<html>',
                 '<head>Login</head>',
@@ -257,21 +378,29 @@ class Server:
                 '<h1>Welcome</h1>',
                 '<p>You have found your way to web-adventure, and in order to continue, you need to...</p>',
                 '<h1>Login</h1>',
+                '<p>Log in to an existing account if you have one. Please do not resue passwords!</p>',
                 '<form action="/login" method="post">',
                     '<label for="login">Username:</label>',
                     '<input type="text" id="login" name="login" autocomplete="off" autofocus maxlength=20 required size=20/>',
-                    '<label for="pass">Spec:</label>',
+                    '<br/>',
+                    '<label for="pass">Password:</label>',
                     '<input type="password" id="pass" name="pass" autocomplete="off" autofocus maxlength=20 required size=20/>',
+                    '<br/>',
                     '<input type="submit" value="Go"/>',
                 '</form>',
-                # TODO add new user link here - OnGetNewUser, different form, different post?
+                '<h1>Create</h1>',
+                '<p><a href="/create">Create a new account</a> if you do not already have one!</p>',
+                # TODO maybe also have a little about page?
                 '</body>',
                 '</html>',
             ]
+        strOut = '\n'.join(lStr)
+        abOut = strOut.encode()
 
-        for str0 in lStr:
-            handler.wfile.write(str0.encode())
-            handler.wfile.write('\n'.encode())
+        handler.send_response(200)
+        handler.send_header('Content-Length', len(abOut))
+        handler.end_headers()
+        handler.wfile.write(abOut)
 
     def OnGetFavicon(self, handler):
         """Favicon handling"""

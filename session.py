@@ -1,6 +1,7 @@
 # session-related machinery (tracks player state)
 
 import glob
+import hashlib
 import yaml
 
 class Session:
@@ -8,6 +9,7 @@ class Session:
 
     def __init__(self):
         self.m_uid = None
+        self.m_pwd = 'abcdefg,0123456789ABCDEF'
         self.m_path = None
         self.m_room = None
         self.m_roomSaved = None
@@ -26,6 +28,7 @@ class Session:
             return
 
         self.m_uid = doc.get('uid')
+        self.m_pwd = doc.get('pwd')
         self.m_roomSaved = doc.get('room')  # NOTE string, not room
         self.m_mpVarVal = doc.get('vars')
         self.m_fIsDirty = False
@@ -37,6 +40,7 @@ class Session:
 
         dSelf = {}
         dSelf['uid'] = self.m_uid
+        dSelf['pwd'] = self.m_pwd
         dSelf['room'] = self.m_room.m_name
         dSelf['vars'] = self.m_mpVarVal
 
@@ -86,6 +90,15 @@ class Session:
         self.m_mpVarVal[var] = value
         self.m_fIsDirty = True
 
+    def FMatchesCreds(self, pwd):
+        """Returns True if the given user/password combo matches this session"""
+
+        hashSelf, salt = self.m_pwd.split(',')
+        dk = hashlib.pbkdf2_hmac('sha256', pwd, salt, 100000)
+        hashCheck = dk.hex()
+
+        return hashSelf == hashCheck
+
 
 
 class Group:
@@ -117,6 +130,18 @@ class Group:
         for session in self.m_mpUidSession.values():
             room = rooms.Room(session.m_roomSaved)
             session.SetRoomCur(room)
+
+    def SessionFromUid(self, uid):
+        return self.m_mpUidSession.get(uid, None)
+
+    def SessionCreate(self):
+        """Generate untracked "blank" session"""
+        return Session()
+
+    def LSession(self):
+        """Return list (or generator) of sessions in the group"""
+
+        return self.m_mpUidSession.values()
 
 if __name__ == '__main__':
     # test driver for session stuff
