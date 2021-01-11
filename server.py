@@ -1,6 +1,7 @@
 # http server driver and associated machinery
 
 import http.server as Hs
+import secrets
 
 
 
@@ -121,6 +122,17 @@ class Server:
         # TODO: some notion of sid timeout?
 
         return True
+
+    def SidGenerate(self):
+        """Generate a new unused SID"""
+
+        # Seems like the loop should be completely unnecessary, but also shouldn't
+        #  really hurt anything to have it
+
+        while True:
+            sid = secrets.token_hex(nbytes=16)
+            if sid not in self.m_mpSidSession:
+                return sid
 
     def HandlePost(self, handler):
         """Dispatch an HTTP POST request to the appropriate place"""
@@ -332,10 +344,33 @@ class Server:
             lStr.append('<p>You could try to <a href="/login">login again</a> if you would like.</p>')
             lStr.append('<p>You could also try to <a href="/create">create a new account</a> instead.</p>')
         else:
-            # TODO
+            # for safety, wipe any other sids that are pointing to this session
+
+            lSidRemove = []
+            for sidOther, session in self.m_mpSidSession.items():
+                if session == sessionCheck:
+                    lSidRemove.append(sidOther)
+
+            for sidOther in lSidRemove:
+                del self.m_mpSidSession[sidOther]
+
             # generate sid and map it to this session
-            # send back welcome page of some kind
-            pass
+
+            sid = self.SidGenerate()
+            self.m_mpSidSession[sid] = sessionCheck
+
+            # send back welcome page
+
+            lStr.append('<h1>Login Successful!</h1>')
+            lStr.append('<p>You logged in! You win!</p>')
+            lStr.append('<p>Clearly this does not actually make sense to display.</p>')
+            lStr.append('<p>It is possible the correct flow here is to do OnRoom...?</p>')
+            lStr.append('<p>At any rate...</p>')
+            lStr.append('<form action="/room" method="post">')
+            # This hidden input will need to be in basically all room posts...do we need to formalize/remember/whatever?
+            lStr.append('<input type="hidden" name="sid" id="sid" value="{sid}"/>'.format(sid=sid))
+            lStr.append('<input type="submit" value="Continue Your Adventure"/>')
+            lStr.append('</form>')
 
         lStr.append('</body>')
         lStr.append('</html>')
