@@ -409,6 +409,7 @@ class Server:
                 '<body>',
                 ]
 
+        # DEBUG: just spit out post values here for now
         for key, value in dPost:
             lStr.append('<p>{k}: "{v}"</p>'.format(k=key, v=value))
 
