@@ -329,10 +329,6 @@ class Server:
         lStr.append('<html>')
         lStr.append('<body>')
 
-        # DEBUG - show what we got
-        lStr.append('<p>user: "{u}"</p>'.format(u=dPost.get('login', 'MISSING')))
-        lStr.append('<p>pass: "{p}"</p>'.format(p=dPost.get('pass', 'MISSING')))
-
         # Check if we have a user and password that match. To avoid timing attacks we check
         #  a session, even if we don't have one with a matching UID.
 
