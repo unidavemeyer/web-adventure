@@ -70,6 +70,11 @@ class Rooms:
                         # TODO: come up with a better plan here
                         self.m_roomStart = room
 
+    def Room(self, name):
+        """Return the room by the given name, or None if there is no such room"""
+
+        return self.m_mpNameRoom.get(name, None)
+
 if __name__ == '__main__':
     # testing code if we run layout directly
     rooms = Rooms()

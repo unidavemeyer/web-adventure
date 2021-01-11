@@ -2,6 +2,7 @@
 
 import glob
 import hashlib
+import os
 import secrets
 import yaml
 
@@ -50,13 +51,15 @@ class Session:
 
         tmp = self.m_path + ".new"
         with open(tmp, 'w') as fileOut:
-            yaml.serialize(dSelf, fileOut)
+            yaml.dump(dSelf, fileOut)
 
         old = self.m_path + '.old'
         if os.path.exists(old):
             os.remove(old)
 
-        os.rename(self.m_path, old)
+        if os.path.exists(self.m_path):
+            os.rename(self.m_path, old)
+
         os.rename(tmp, self.m_path)
 
         self.m_fIsDirty = False
@@ -72,7 +75,7 @@ class Session:
         if self.m_path is None:
             lStrErr.append("UID {u} missing its path".format(u=self.m_uid))
 
-        if self.m_roomSaved is None:
+        if self.m_roomSaved is None and self.m_room is None:
             lStrErr.append("UID {u} missing its room".format(u=self.m_uid))
 
         if not isinstance(self.m_mpVarVal, dict):
@@ -100,7 +103,7 @@ class Session:
         """Returns True if the given user/password combo matches this session"""
 
         hashSelf, salt = self.m_pwd.split(',')
-        dk = hashlib.pbkdf2_hmac(self.s_algoHash, pwd, salt, self.s_cIterHash)
+        dk = hashlib.pbkdf2_hmac(self.s_algoHash, pwd.encode(), salt.encode(), self.s_cIterHash)
         hashCheck = dk.hex()
 
         return hashSelf == hashCheck
@@ -110,7 +113,7 @@ class Session:
 
         self.m_uid = uid
         salt = secrets.token_hex(nbytes=32)
-        dk = hashlib.pbkdf2_hmac(self.s_algoHash, pwd, salt, self.s_cIterHash)
+        dk = hashlib.pbkdf2_hmac(self.s_algoHash, pwd.encode(), salt.encode(), self.s_cIterHash)
         self.m_pwd = ','.join([dk.hex(), salt])
         self.m_fIsDirty = True
 

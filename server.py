@@ -1,6 +1,7 @@
 # http server driver and associated machinery
 
 import http.server as Hs
+import os
 import secrets
 
 
@@ -69,8 +70,9 @@ class Handler(Hs.BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         self.wfile.write('''<html>
-                <head>Oops!</head>
+                <head><title>Oops!</title></head>
                 <body>
+                <h1>Oops!</h1>
                 <p>Not sure how you ended up here, but good job! (Maybe your session timed out?)</p>
                 <p></p>
                 <p>Try <a href="/login">logging in</a> to continue.</p>
@@ -116,7 +118,7 @@ class Server:
         ths.serve_forever()
 
     def FIsValidSid(self, sid):
-        if self.m_mpSidSession.get('sid') is None:
+        if self.m_mpSidSession.get(sid) is None:
             return False
 
         # TODO: some notion of sid timeout?
@@ -290,7 +292,7 @@ class Server:
 
         lStr = [
                 '<html>',
-                '<head>New Player</head>',
+                '<head><title>New Player</title></head>',
                 '<body>',
                 '<h1>Create New Player</h1>',
                 '<p>If you would like to play web-adventure you will need to create an account. Please fill in the following fields.</p>',
@@ -338,7 +340,7 @@ class Server:
         if sessionCheck is None:
             sessionCheck = self.m_group.SessionCreate()
 
-        if not sessionCheck.FMatchesCreds(dPost.get('pass'))
+        if not sessionCheck.FMatchesCreds(dPost.get('pass')):
             lStr.append('<h1>Invalid Login</h1>')
             lStr.append('<p>The user or password you supplied do not match our records.</p>')
             lStr.append('<p>You could try to <a href="/login">login again</a> if you would like.</p>')
@@ -394,10 +396,12 @@ class Server:
         # deal with missing/incorrect sessions (has to handle in room logic...sigh...)
 
         if 'sid' not in dPost:
+            handler.log_error('No sid in post data')
             self.OnRedirectLogin(handler)
             return
 
         if not self.FIsValidSid(dPost['sid']):
+            handler.log_error('Invalid sid "{sid}" given'.format(sid=dPost['sid']))
             self.OnRedirectLogin(handler)
             return
 
@@ -410,10 +414,10 @@ class Server:
                 ]
 
         # DEBUG: just spit out post values here for now
-        for key, value in dPost:
+        for key, value in dPost.items():
             lStr.append('<p>{k}: "{v}"</p>'.format(k=key, v=value))
 
-        lStr.append([
+        lStr.extend([
                 '</body>',
                 '</html>',
                 ])
@@ -427,7 +431,7 @@ class Server:
 
         lStr = [
                 '<html>',
-                '<head>Login</head>',
+                '<head><title>Login</title></head>',
                 '<body>',
                 '<h1>Welcome</h1>',
                 '<p>You have found your way to web-adventure, and in order to continue, you need to...</p>',
@@ -469,7 +473,7 @@ class Server:
         handler.send_response(200)
         handler.end_headers()
         handler.wfile.write('''<html>
-                <head>Login</head>
+                <head><title>Login</title></head>
                 <body>
                 <h1>Welcome</h1>
                 <p>You have found your way to web-adventure, and in order to continue, you need to...</p>
