@@ -148,6 +148,9 @@ class Session:
         #  instead be able to use <button> elements, although I don't see a way to know which one was used
         #  to submit in that case either. Maybe multiple submits is ok, and something magic happens if that
         #  setup is used?
+        #
+        # stack exchange suggests multiple forms is the way to go, so I'll see about organizing that model
+        #  when I next work here -- will need to take the sid arg along in here
 
         return '<input type="submit" value="{verb}"/>'.format(verb=exit['verb'])
 
