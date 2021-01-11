@@ -130,7 +130,28 @@ class Session:
 
         pass
 
-    def RenderRoomCur(self, handler):
+    def StrTryAddExit(self, exit, handler):
+        """Returns the form component for the exit if it is legal to do so, and empty string otherwise"""
+
+        # TODO add exit condition handling
+
+        # skip invalid exits (no name or verb)
+
+        if 'name' not in exit:
+            return ''
+
+        if 'verb' not in exit:
+            return ''
+
+        # TODO probably need to do a form for each exit, so we could put hidden fields in with the actual
+        #  choice? otherwise, I don't think we can see each button separately in the post results...? may
+        #  instead be able to use <button> elements, although I don't see a way to know which one was used
+        #  to submit in that case either. Maybe multiple submits is ok, and something magic happens if that
+        #  setup is used?
+
+        return '<input type="submit" value="{verb}"/>'.format(verb=exit['verb'])
+
+    def RenderRoomCur(self, sid, handler):
         """Renders the current room, with appropriate settings, etc., to the given handler"""
         
         # TODO should cache contents for reload scenarios...maybe? maybe skip adjust if we find a reload?
@@ -144,9 +165,21 @@ class Session:
         lStr.append('</head>')
         lStr.append('<body>')
         lStr.append('<h1>{name}</h1>'.format(name=room.m_name))
-        lStr.append('<p>{desc}</p>'.format(desc=room.m_desc))
 
-        # TODO add in exits here
+        # Note that we pass the var/val dictionary here for formatting purposes in case the
+        #  description wants to include things about current session state
+
+        # TODO could also add handling for /img subtree and thus allow graphics links to work (!!)
+
+        lStr.append('<p>{desc}</p>'.format(desc=room.m_desc.format(**self.m_mpVarVal)))
+
+        lStr.append('<form action="/room" method="post">')
+        lStr.append('<input type="hidden" name="sid" id="sid" value="{sid}"/>'.format(sid=sid))
+
+        for exit in room.LExit():
+            lStr.append(StrTryAddExit(exit))
+
+        lStr.append('</form>')
 
         # TODO add generic links for logout, about, any others here
 

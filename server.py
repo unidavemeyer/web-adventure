@@ -411,7 +411,7 @@ class Server:
             self.OnRedirectLogin(handler)
             return
 
-        session.RenderRoomCur(handler)
+        session.RenderRoomCur(sid, handler)
 
     def OnGetLogin(self, handler):
         """Provide the initial login page"""

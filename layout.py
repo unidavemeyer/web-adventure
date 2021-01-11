@@ -41,6 +41,11 @@ class Room:
 
         return '\n'.join(lStrErr)
 
+    def LExit(self):
+        return self.m_lExit
+
+    def LChange(self):
+        return self.m_lChange
 
 
 class Rooms:

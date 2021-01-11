@@ -2,16 +2,20 @@
 name: Starting Room
 desc: You are standing in the starting area!
 exits:
-  - Left Room
-  - Right Room
+  - name: Left Room
+    verb: Go left!
+  - name: Right Room
+    verb: Go right!
 ---
 name: Left Room
 desc: This is the left room. Rejoice!
 exits:
-  - Starting Room
+  - name: Starting Room
+    verb: Go back
 ---
 name: Right Room
 desc: This is the right room. Hurry away!
 exits:
-  - Starting Room
+  - name: Starting Room
+    verb: Run away!
 ---
