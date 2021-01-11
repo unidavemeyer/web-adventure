@@ -380,47 +380,38 @@ class Server:
     def OnPostRoom(self, handler, dPost):
         """Handle the submit end of attempting to access a room"""
 
-        # TODO actually run room logic here
-        #
-        # flow:
-        #  - post should indicate desired exit index
-        #  - if post wants to set room, adjust session
-        #  - get room from session
-        #  - ask session to "render" current room
-        #    - session should cache room contents to avoid redo on reload, etc.
-
         # deal with missing/incorrect sessions (has to handle in room logic...sigh...)
+
+        # TODO redirect to login here is fairly unfriendly, should consider producing an
+        #  error page of some kind that has maybe helpful data instead
 
         if 'sid' not in dPost:
             handler.log_error('No sid in post data')
             self.OnRedirectLogin(handler)
             return
 
-        if not self.FIsValidSid(dPost['sid']):
-            handler.log_error('Invalid sid "{sid}" given'.format(sid=dPost['sid']))
+        sid = dPost['sid']
+        if not self.FIsValidSid(sid):
+            handler.log_error('Invalid sid "{sid}" given'.format(sid=sid))
             self.OnRedirectLogin(handler)
             return
 
-        handler.send_response(200)
-        handler.end_headers()
-        
-        lStr = [
-                '<html>',
-                '<body>',
-                ]
+        session = self.m_mpSidSession.get(sid, None)
+        if session is None:
+            handler.log_error('Sid "{sid}" valid but no session?'.format(sid=sid))
+            self.OnRedirectLogin(handler)
+            return
 
-        # DEBUG: just spit out post values here for now
-        for key, value in dPost.items():
-            lStr.append('<p>{k}: "{v}"</p>'.format(k=key, v=value))
+        # do the actual work, on the session, to possibly adjust and then display the current room
 
-        lStr.extend([
-                '</body>',
-                '</html>',
-                ])
+        session.TryAdjustRoom(dPost)
+        room = session.RoomCur()
+        if room is None:
+            handler.log_error('Sid "{sid}" session "{uid}" had no current room'.format(sid=sid, uid=session.m_uid))
+            self.OnRedirectLogin(handler)
+            return
 
-        for str0 in lStr:
-            handler.wfile.write(str0.encode())
-            handler.wfile.write('\n'.encode())
+        session.RenderRoomCur(handler)
 
     def OnGetLogin(self, handler):
         """Provide the initial login page"""

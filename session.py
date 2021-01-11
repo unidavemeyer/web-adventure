@@ -123,6 +123,43 @@ class Session:
         self.m_path = path
         self.m_fIsDirty = True
 
+    def TryAdjustRoom(self, dPost):
+        """Handles any commands in dPost that could adjust the current room, etc."""
+
+        # TODO check if dPost says an exit index; if so, and it is valid, adjust the current room
+
+        pass
+
+    def RenderRoomCur(self, handler):
+        """Renders the current room, with appropriate settings, etc., to the given handler"""
+        
+        # TODO should cache contents for reload scenarios...maybe? maybe skip adjust if we find a reload?
+
+        room = self.RoomCur()
+
+        lStr = []
+        lStr.append('<html>')
+        lStr.append('<head>')
+        lStr.append('<title>{name}</title>'.format(name=room.m_name))
+        lStr.append('</head>')
+        lStr.append('<body>')
+        lStr.append('<h1>{name}</h1>'.format(name=room.m_name))
+        lStr.append('<p>{desc}</p>'.format(desc=room.m_desc))
+
+        # TODO add in exits here
+
+        # TODO add generic links for logout, about, any others here
+
+        lStr.append('</body>')
+        lStr.append('</html>')
+
+        abOut = '\n'.join(lStr).encode()
+
+        handler.send_response(200)
+        handler.send_header('Content-Length', len(abOut))
+        handler.end_headers()
+
+        handler.wfile.write(abOut)
 
 class Group:
     """All of the sessions known by the system"""
