@@ -49,7 +49,6 @@ class Rooms:
     def __init__(self):
         self.m_mpNameRoom = {}
         self.m_roomStart = None
-        pass
 
     def Load(self, path):
         with open(path, 'r') as fileIn:

@@ -2,10 +2,14 @@
 
 import glob
 import hashlib
+import secrets
 import yaml
 
 class Session:
     """Information about the state for a single player"""
+
+    s_cIterHash = 100000
+    s_algoHash = 'sha256'
 
     def __init__(self):
         self.m_uid = None
@@ -49,7 +53,9 @@ class Session:
             yaml.serialize(dSelf, fileOut)
 
         old = self.m_path + '.old'
-        os.remove(old)
+        if os.path.exists(old):
+            os.remove(old)
+
         os.rename(self.m_path, old)
         os.rename(tmp, self.m_path)
 
@@ -94,11 +100,25 @@ class Session:
         """Returns True if the given user/password combo matches this session"""
 
         hashSelf, salt = self.m_pwd.split(',')
-        dk = hashlib.pbkdf2_hmac('sha256', pwd, salt, 100000)
+        dk = hashlib.pbkdf2_hmac(self.s_algoHash, pwd, salt, self.s_cIterHash)
         hashCheck = dk.hex()
 
         return hashSelf == hashCheck
 
+    def SetCreds(self, uid, pwd):
+        """Sets the creds for this session object directly (assumes it is valid to do so)"""
+
+        self.m_uid = uid
+        salt = secrets.token_hex(nbytes=32)
+        dk = hashlib.pbkdf2_hmac(self.s_algoHash, pwd, salt, self.s_cIterHash)
+        self.m_pwd = ','.join([dk.hex(), salt])
+        self.m_fIsDirty = True
+
+    def SetPath(self, path):
+        """Sets up the path for where this session should be saved"""
+
+        self.m_path = path
+        self.m_fIsDirty = True
 
 
 class Group:
@@ -106,9 +126,12 @@ class Group:
 
     def __init__(self):
         self.m_mpUidSession = {}
+        self.m_pathDir = None
 
     def Load(self, pathDir):
         """load all files from the directory, assuming they're sessions"""
+
+        self.m_pathDir = pathDir
 
         for path in glob.glob("{p}/*".format(p=pathDir)):
             session = Session()
@@ -142,6 +165,11 @@ class Group:
         """Return list (or generator) of sessions in the group"""
 
         return self.m_mpUidSession.values()
+
+    def AddSession(self, session):
+        """Adds the given session to the group"""
+
+        self.m_mpUidSession[session.m_uid] = session
 
 if __name__ == '__main__':
     # test driver for session stuff

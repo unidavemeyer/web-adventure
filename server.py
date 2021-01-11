@@ -247,13 +247,31 @@ class Server:
             self.OnCreateError(handler, "Passwords do not match")
             return
 
-        # TODO create a session with the given user/password
+        # create a session with the given user/password
 
-        # TODO add newly created session to the session group
+        session = self.m_group.SessionCreate()
+        session.SetCreds(uid, pwd1)
+        session.SetPath(os.path.join(self.m_group.m_pathDir, "{u}.session".format(u=uid)))
+        session.SetRoomCur(self.m_rooms.m_roomStart)
 
-        # TODO call into OnPostLogin with updated dPost values
+        strErr = session.StrErrors()
+        if strErr:
+            self.OnCreateError(handler, "Error creating user: " + strErr)
+            return
 
-        pass
+        # stamp the session to disk and add to the group
+
+        session.Save()
+        self.m_group.AddSession(session)
+
+        # pretend that the user just logged in
+
+        dPost = {
+                'login' : uid,
+                'pass' : pwd1,
+            }
+
+        self.OnPostLogin(handler, dPost)
 
     def OnGetCreate(self, handler):
         """Page to allow a new player to create a new account"""
