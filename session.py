@@ -4,6 +4,7 @@ import glob
 import hashlib
 import os
 import secrets
+import server
 import yaml
 
 class Session:
@@ -123,15 +124,33 @@ class Session:
         self.m_path = path
         self.m_fIsDirty = True
 
-    def TryAdjustRoom(self, dPost):
+    def TryAdjustRoom(self, dPost, handler):
         """Handles any commands in dPost that could adjust the current room, etc."""
 
-        # TODO check if dPost says an exit index; if so, and it is valid, adjust the current room
+        # No adjustment if we're not asked to go anywhere
 
-        pass
+        if 'dest' not in dPost:
+            return
 
-    def StrTryAddExit(self, exit, handler):
-        """Returns the form component for the exit if it is legal to do so, and empty string otherwise"""
+        dest = dPost['dest']
+
+        # NOTE it appears that spaces get turned into plus signs on form submit, so undo that here
+
+        dest = dest.replace('+', ' ')
+
+        # bad coupling here
+
+        rooms = server.g_server.m_rooms
+        roomNext = rooms.Room(dest)
+
+        if roomNext:
+            # TODO run enter-the-room logic
+            self.SetRoomCur(roomNext)
+
+        # TODO do we need handling for the case where the room doesn't exist? just leaving the player there is weird, I guess?
+
+    def LStrTryAddExit(self, exit, sid):
+        """Returns the list of form strings for the exit if it is legal, and empty list otherwise"""
 
         # TODO add exit condition handling
 
@@ -143,16 +162,20 @@ class Session:
         if 'verb' not in exit:
             return ''
 
-        # TODO probably need to do a form for each exit, so we could put hidden fields in with the actual
-        #  choice? otherwise, I don't think we can see each button separately in the post results...? may
-        #  instead be able to use <button> elements, although I don't see a way to know which one was used
-        #  to submit in that case either. Maybe multiple submits is ok, and something magic happens if that
-        #  setup is used?
-        #
-        # stack exchange suggests multiple forms is the way to go, so I'll see about organizing that model
-        #  when I next work here -- will need to take the sid arg along in here
+        # NOTE that by using a separate form for each exit, we can thus include the index as a different
+        #  value so that we can distinguish which exit was selected
 
-        return '<input type="submit" value="{verb}"/>'.format(verb=exit['verb'])
+        # TODO should we include the current room by name?
+        # TODO should we include the exit by name instead of index?
+
+        lStr = []
+        lStr.append('<form action="/room" method="post">')
+        lStr.append('<input type="hidden" name="sid" id="sid" value="{sid}"/>'.format(sid=sid))
+        lStr.append('<input type="hidden" name="dest" id="dest" value="{dest}"/>'.format(dest=exit['name']))
+        lStr.append('<input type="submit" value="{verb}"/>'.format(verb=exit['verb']))
+        lStr.append('</form>')
+
+        return lStr
 
     def RenderRoomCur(self, sid, handler):
         """Renders the current room, with appropriate settings, etc., to the given handler"""
@@ -176,13 +199,8 @@ class Session:
 
         lStr.append('<p>{desc}</p>'.format(desc=room.m_desc.format(**self.m_mpVarVal)))
 
-        lStr.append('<form action="/room" method="post">')
-        lStr.append('<input type="hidden" name="sid" id="sid" value="{sid}"/>'.format(sid=sid))
-
         for exit in room.LExit():
-            lStr.append(StrTryAddExit(exit))
-
-        lStr.append('</form>')
+            lStr.extend(self.LStrTryAddExit(exit, sid))
 
         # TODO add generic links for logout, about, any others here
 

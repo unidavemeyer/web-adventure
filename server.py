@@ -404,7 +404,7 @@ class Server:
 
         # do the actual work, on the session, to possibly adjust and then display the current room
 
-        session.TryAdjustRoom(dPost)
+        session.TryAdjustRoom(dPost, handler)
         room = session.RoomCur()
         if room is None:
             handler.log_error('Sid "{sid}" session "{uid}" had no current room'.format(sid=sid, uid=session.m_uid))
