@@ -16,7 +16,7 @@ class Room:
         self.m_name = doc.get('name')
         self.m_desc = doc.get('desc')
         self.m_lExit = doc.get('exits')
-        self.m_lChange = doc.get('changes')
+        self.m_lChange = doc.get('changes', [])
 
     def StrErrors(self):
         lStrErr = []

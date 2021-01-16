@@ -3,6 +3,7 @@
 import glob
 import hashlib
 import os
+import random
 import secrets
 import server
 import yaml
@@ -124,6 +125,48 @@ class Session:
         self.m_path = path
         self.m_fIsDirty = True
 
+    def RunChanges(self, room):
+        """Apply any changes for the given room to this session"""
+
+        for change in room.LChange():
+            op = change[0]
+
+            if op == 'set':
+                # set a session variable to a fixed value
+                var = change[1]
+                value = change[2]
+                self.m_mpVarVal[var] = value
+
+            elif op == 'add':
+                # add a fixed value to a session variable
+                var = change[1]
+                value = change[2]
+                # TODO: cleaner/more useful handling of invalid/missing/non-numeric values?
+                try:
+                    self.m_mpVarVal[var] = self.m_mpVarVal.get(var, 0) + int(value)
+                except:
+                    pass
+
+            elif op == 'addrand':
+                # add a random ranged value to a session variable
+                var = change[1]
+                low = change[2]
+                high = change[3]
+                # TODO: cleaner/more useful handling of invalid/missing/non-numeric values?
+                try:
+                    self.m_mpVarVal[var] = self.m_mpVarVal.get(var, 0) + random.randint(low, high)
+                except:
+                    pass
+
+            elif op == 'setrand':
+                # set a session variable to a ranged randomized value
+                var = change[1]
+                low = change[2]
+                high = change[3]
+                self.m_mpVarVal[var] = random.randint(low, high)
+
+        # TODO: if we changed anything, save the session!
+
     def TryAdjustRoom(self, dPost, handler):
         """Handles any commands in dPost that could adjust the current room, etc."""
 
@@ -144,7 +187,7 @@ class Session:
         roomNext = rooms.Room(dest)
 
         if roomNext:
-            # TODO run enter-the-room logic
+            self.RunChanges(roomNext)
             self.SetRoomCur(roomNext)
 
         # TODO do we need handling for the case where the room doesn't exist? just leaving the player there is weird, I guess?
@@ -172,7 +215,7 @@ class Session:
         lStr.append('<form action="/room" method="post">')
         lStr.append('<input type="hidden" name="sid" id="sid" value="{sid}"/>'.format(sid=sid))
         lStr.append('<input type="hidden" name="dest" id="dest" value="{dest}"/>'.format(dest=exit['name']))
-        lStr.append('<input type="submit" value="{verb}"/>'.format(verb=exit['verb']))
+        lStr.append('<input type="submit" value="{verb}"/>'.format(verb=exit['verb'].format(**self.m_mpVarVal)))
         lStr.append('</form>')
 
         return lStr

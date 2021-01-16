@@ -9,13 +9,35 @@ exits:
 ---
 name: Left Room
 desc: This is the left room. Rejoice!
+changes:
+  - [set, monsters, 1]
 exits:
   - name: Starting Room
     verb: Go back
+  - name: The Garage
+    verb: Go to the garage
+---
+name: The Garage
+desc: In the garage, there are {jackhammers} jackhammers ominously floating
+  in the middle of the air. They are vibrating as well, making a
+  clicking noise. Click. Click. Click. How odd.
+changes:
+  - [addrand, jackhammers, 1, 111]
+exits:
+  - name: Right Room
+    verb: Go Right
 ---
 name: Right Room
-desc: This is the right room. Hurry away!
+desc: This is the right room. It has {monsters} monsters in it,
+  each of whom are carrying {fleas} fleas, and each of them has
+  {bags} bags. Hurry away!
+changes:
+  - [add, monsters, 2]
+  - [add, fleas, 7]
+  - [setrand, bags, 2, 25]
 exits:
   - name: Starting Room
     verb: Run away!
+  - name: The Garage
+    verb: Escape to the garage
 ---
