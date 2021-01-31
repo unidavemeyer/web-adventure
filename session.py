@@ -1,5 +1,6 @@
 # session-related machinery (tracks player state)
 
+import collections
 import glob
 import hashlib
 import os
@@ -20,7 +21,7 @@ class Session:
         self.m_path = None
         self.m_room = None
         self.m_roomSaved = None
-        self.m_mpVarVal = {}
+        self.m_mpVarVal = collections.defaultdict(int)  # auto-create keys with 0 value
         self.m_fIsDirty = False
 
     def Load(self, path):
@@ -37,7 +38,8 @@ class Session:
         self.m_uid = doc.get('uid')
         self.m_pwd = doc.get('pwd')
         self.m_roomSaved = doc.get('room')  # NOTE string, not room
-        self.m_mpVarVal = doc.get('vars')
+        self.m_mpVarVal = collections.defaultdict(int)
+        self.m_mpVarVal.update(doc.get('vars'))
         self.m_fIsDirty = False
 
     def Save(self):
@@ -49,7 +51,7 @@ class Session:
         dSelf['uid'] = self.m_uid
         dSelf['pwd'] = self.m_pwd
         dSelf['room'] = self.m_room.m_name
-        dSelf['vars'] = self.m_mpVarVal
+        dSelf['vars'] = dict(self.m_mpVarVal)
 
         tmp = self.m_path + ".new"
         with open(tmp, 'w') as fileOut:
@@ -63,6 +65,9 @@ class Session:
             os.rename(self.m_path, old)
 
         os.rename(tmp, self.m_path)
+
+        if os.path.exists(old):
+            os.remove(old)
 
         self.m_fIsDirty = False
 
@@ -125,11 +130,37 @@ class Session:
         self.m_path = path
         self.m_fIsDirty = True
 
+    def StrFormatSmart(self, strIn):
+        """Do "smart" formatting of strIn (expected to be a format string) vs. the contents of
+        mp_mpVarValue. In particular, deal with cases where the format string talks about items
+        that don't have keys in the var map."""
+
+        # NOTE: I attempted to deal with this by using defaultdict, but unfortunately, the ** expansion
+        #  that is used to convert dictionaries into keyword expansions of course doesn't default expand
+        #  every possible keyword out, so defaultdict didn't actually help with that case at all. Since
+        #  there isn't a way to pass a "smart" dictionary like that into str.format(), we deal with that
+        #  ourselves here.
+
+        # TODO: be smarter/safer about dealing with this stuff -- doing the simple version where we detect
+        #  problems and fix them, rather than attempting to "correctly" parse the format syntax up front
+
+        cIter = 100
+        while cIter > 0:
+            cIter -= 1
+            try:
+                return strIn.format(**self.m_mpVarVal)
+            except KeyError as ke:
+                # TODO: Is this safe/guaranteed?
+                self.m_mpVarVal[ke.args[0]] = 0
+
+        return "<could not format>"
+
     def RunChanges(self, room):
         """Apply any changes for the given room to this session"""
 
         for change in room.LChange():
             op = change[0]
+            self.m_fIsDirty = True
 
             if op == 'set':
                 # set a session variable to a fixed value
@@ -165,8 +196,6 @@ class Session:
                 high = change[3]
                 self.m_mpVarVal[var] = random.randint(low, high)
 
-        # TODO: if we changed anything, save the session!
-
     def TryAdjustRoom(self, dPost, handler):
         """Handles any commands in dPost that could adjust the current room, etc."""
 
@@ -192,30 +221,99 @@ class Session:
 
         # TODO do we need handling for the case where the room doesn't exist? just leaving the player there is weird, I guess?
 
+    def FEvaluateCond(self, cond):
+        """Returns True if the given condition evaluates to True, and False if not"""
+        
+        if isinstance(cond, dict):
+            if len(cond) != 1:
+                return false
+
+            if 'and' in cond:
+                lCond = cond['and']
+            elif 'or' in cond:
+                lCond = cond['or']
+            else:
+                # TODO: logging?
+                return False
+
+            if not isinstance(lCond, list):
+                # TODO: logging?
+                return False
+
+            lF = [self.FEvaluateCond(x) for x in lCond]
+            setF = set(lF)
+
+            if 'and' in cond:
+                return True in setF and False not in setF
+            elif 'or' in cond:
+                return True in setF
+            else:
+                # TODO: logging?
+                return False
+
+        elif isinstance(cond, list):
+            # should be a three part list: op, var, value
+
+            if len(cond) != 3:
+                # TODO: logging?
+                return False
+
+            op = cond[0]
+            var = cond[1]
+            value = cond[2]
+
+            if 'var' in op:
+                # expand value by looking it up
+                value = self.m_mpVarVal.get(value, 0)
+
+            if op == 'eq' or op == 'eqvar':
+                return self.m_mpVarVal.get(var, 0) == int(value)
+            elif op == 'gt' or op == 'gtvar':
+                return self.m_mpVarVal.get(var, 0) > int(value)
+            elif op == 'lt' or op == 'ltvar':
+                return self.m_mpVarVal.get(var, 0) < int(value)
+            elif op == 'ne' or op == 'nevar':
+                return self.m_mpVarVal.get(var, 0) != int(value)
+            else:
+                # TODO: logging?
+                return False
+
+        # TODO: logging?
+        return False
+
+    def FShouldProvideExit(self, exit):
+        """Returns True if the exit should be provided, False if the exit should not be provided"""
+
+        # exits that do not have a condition should always be provided
+
+        if 'cond' not in exit:
+            return True
+
+        return self.FEvaluateCond(exit['cond'])
+
     def LStrTryAddExit(self, exit, sid):
         """Returns the list of form strings for the exit if it is legal, and empty list otherwise"""
-
-        # TODO add exit condition handling
 
         # skip invalid exits (no name or verb)
 
         if 'name' not in exit:
-            return ''
+            return []
 
         if 'verb' not in exit:
-            return ''
+            return []
+
+        if not self.FShouldProvideExit(exit):
+            return []
 
         # NOTE that by using a separate form for each exit, we can thus include the index as a different
         #  value so that we can distinguish which exit was selected
 
-        # TODO should we include the current room by name?
-        # TODO should we include the exit by name instead of index?
-
         lStr = []
         lStr.append('<form action="/room" method="post">')
         lStr.append('<input type="hidden" name="sid" id="sid" value="{sid}"/>'.format(sid=sid))
+        lStr.append('<input type="hidden" name="cur" id="cur" value="{cur}"/>'.format(cur=self.RoomCur().m_name))
         lStr.append('<input type="hidden" name="dest" id="dest" value="{dest}"/>'.format(dest=exit['name']))
-        lStr.append('<input type="submit" value="{verb}"/>'.format(verb=exit['verb'].format(**self.m_mpVarVal)))
+        lStr.append('<input type="submit" value="{verb}"/>'.format(verb=self.StrFormatSmart(exit['verb'])))
         lStr.append('</form>')
 
         return lStr
@@ -238,9 +336,7 @@ class Session:
         # Note that we pass the var/val dictionary here for formatting purposes in case the
         #  description wants to include things about current session state
 
-        # TODO could also add handling for /img subtree and thus allow graphics links to work (!!)
-
-        lStr.append('<p>{desc}</p>'.format(desc=room.m_desc.format(**self.m_mpVarVal)))
+        lStr.append('<p>{desc}</p>'.format(desc=self.StrFormatSmart(room.m_desc)))
 
         for exit in room.LExit():
             lStr.extend(self.LStrTryAddExit(exit, sid))

@@ -6,6 +6,13 @@ exits:
     verb: Go left!
   - name: Right Room
     verb: Go right!
+  - name: Hidden Passage
+    verb: Sneak out!
+    cond:
+      or:
+        - [gt, jackhammers, 0]
+        - [gt, monsters, 0]
+        - [gt, redbutton, 0]
 ---
 name: Left Room
 desc: This is the left room. Rejoice!
@@ -41,3 +48,40 @@ exits:
   - name: The Garage
     verb: Escape to the garage
 ---
+name: Hidden Passage
+desc: From the hidden passage, you can observe both the Garage and the
+  Right Room. You can see that there are {jackhammers} jackhammers in the
+  Garage, and {monsters} monsters in the Right Room. Thinking carefully,
+  you decide to...
+exits:
+  - name: Starting Room
+    verb: Go back to the Starting Room
+  - name: Red Button
+    verb: Push the red button
+    cond: [gtvar, jackhammers, monsters]
+  - name: End Room
+    verb: Sneak past the empty Right Room
+    cond:
+      and:
+        - [eq, jackhammers, 0]
+        - [eq, monsters, 0]
+---
+name: Red Button
+desc: You push the Red Button. The noise of the clicking jackhammers roars in your
+  ears momentarily, and you hear the noise move from the Garage to the Right Room.
+  Shortly thereafter, there is silence from both the Garage and the Right Room. Maybe
+  the jackhammers and monsters have canceled each other out?
+changes:
+  - [set, monsters, 0]
+  - [set, jackhammers, 0]
+  - [set, redbutton, 1]
+exits:
+  - name: Starting Room
+    verb: Go back to the Starting Room
+---
+name: End Room
+desc: Sneaking past the now empty Right Room to avoid triggering the trap that makes
+  more monsters appear, you made your way to the end of the adventure. Rejoice!
+exits:
+  - name: End Room
+    verb: Loop forever!

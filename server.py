@@ -99,6 +99,8 @@ class Server:
                 "/room" : self.OnPostRoom,
                 }
 
+        # TODO could also add handling for /img subtree and thus allow graphics links to work (!!)
+
         self.m_mpPathGet = {
                 "/" : self.OnGetLogin,
                 "/create" : self.OnGetCreate,
@@ -412,6 +414,9 @@ class Server:
             return
 
         session.RenderRoomCur(sid, handler)
+
+        if session.m_fIsDirty:
+            session.Save()
 
     def OnGetLogin(self, handler):
         """Provide the initial login page"""
