@@ -64,7 +64,7 @@ we can make progress:
  * A git client (compatible with github) needs to be installed on your computer so you can clone the project and
    make contributions.
  * A basic understanding of python will be required in order to follow what is going on. Specific topics of interest:
-   * Variables
+   * Variables (including lists and dictionaries)
    * Functions
    * Classes
    * Methods (vs. functions)
@@ -77,4 +77,4 @@ we can make progress:
    * What does the Handler class do?
    * Where is most of the "interesting" functionality handled (class and file)?
    * Where do you find an example set of game data?
-
+   * Explain the general flow of function calls, etc., when a player clicks on a link
