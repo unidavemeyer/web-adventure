@@ -14,7 +14,7 @@ Architecture
 
 The main idea here is to use python3's http.server module (yes, not marked for production use, this is a toy!) to implement a
 http server, and to thus create one or more request handlers that implement the actual behavior. In order to have multiple players
-(possibly simultaneously) we thus have one or more sessions on the server side. A session remembers state for the particular player
+(possibly simultaneously) we also have one or more sessions on the server side. A session remembers state for the particular player
 so that we can do interesting things like have a "current" URL that always returns where the player is, even if that is a different
 logical location over the course of the game, or a different logical location than another player.
 
@@ -50,3 +50,31 @@ the system as shown below.
    to generating the description and exits for the room.
 
 Examples for how rooms in a room layout can be put together can be found in example\_layout.yml
+
+Big Picture Internship - Spring Semester 2022
+=============================================
+
+Initial Work
+------------
+
+In no particular order, there are several things that need to happen at the beginning of the internship process so that
+we can make progress:
+
+ * Python3 needs to be installed on your computer so that you can run the project.
+ * A git client (compatible with github) needs to be installed on your computer so you can clone the project and
+   make contributions.
+ * A basic understanding of python will be required in order to follow what is going on. Specific topics of interest:
+   * Variables
+   * Functions
+   * Classes
+   * Methods (vs. functions)
+   * Modules (aka imports)
+ * A basic understanding of YAML will be quite helpful in order to author content (see www.yaml.org)
+ * Basic project code understanding:
+   * What does main.py do?
+   * How are areas in the game organized (what classes)? In which file(s) do you find that code?
+   * What does the Session class do?
+   * What does the Handler class do?
+   * Where is most of the "interesting" functionality handled (class and file)?
+   * Where do you find an example set of game data?
+
