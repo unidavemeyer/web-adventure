@@ -78,3 +78,17 @@ we can make progress:
    * Where is most of the "interesting" functionality handled (class and file)?
    * Where do you find an example set of game data?
    * Explain the general flow of function calls, etc., when a player clicks on a link
+
+Project Plan and Goals
+----------------------
+
+Intern expects programming primarily. Moving a character around, picking up items, secret areas,
+possibly an enemy. Graphics side: maybe small animations and like pixellated game.
+
+From discussion, moving on a 2d grid seems like a possibly reasonable thing as a long term goal.
+In order to make that happen, we'd need general image support for the project so that it could
+show images in addition to text content. We probably also need support for something like a table
+so that we could form an image grid, although it's possible that there's a different HTML thing
+that we'd want instead of a table. Presumably, each image tile would also be a link so that the
+player would have freedom to choose where to interact (move, etc.) with every tile. Another thought
+is that maybe we want image maps here...but I'm not sure.
