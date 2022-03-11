@@ -79,8 +79,8 @@ we can make progress:
    * Where do you find an example set of game data?
    * Explain the general flow of function calls, etc., when a player clicks on a link
 
-Project Plan and Goals
-----------------------
+Project Notes
+-------------
 
 Intern expects programming primarily. Moving a character around, picking up items, secret areas,
 possibly an enemy. Graphics side: maybe small animations and like pixellated game.
@@ -92,3 +92,51 @@ so that we could form an image grid, although it's possible that there's a diffe
 that we'd want instead of a table. Presumably, each image tile would also be a link so that the
 player would have freedom to choose where to interact (move, etc.) with every tile. Another thought
 is that maybe we want image maps here...but I'm not sure.
+
+For this to work, I think we'd want to allow the Room to be organized with arbitrary positioning
+for links, along with the image and table bits. The session could keep track of the hero position
+as part of its dictionary entries (x,y coords). Effectively links could adjust the hero position
+or whatever as they were followed. Could still switch between rooms (say at boundary or border
+grid locations) to have different layouts available in different areas. Could pretty easily thus
+do a simple "collecting" model where some room cells had contents. Player entry into the cell
+causes the contents to enter player inventory.
+
+Question: can we generate links appropriately connected to the images that still do POST
+operations instead of GET operations? We want to have the post contents go along so we can track
+session IDs and the like, so we don't really want a plain old GET. If we absolutely cannot do
+POST this way, it would be *possible* to convert to a model where information for the link is
+encoded (say to some base64 hash or some type of general data identifier like the session one)
+such that we could use GET operations instead of POST ones, but that feels a bit on the gross
+side to me. That would be a lot of additional plumbing that we don't currently have, I think.
+
+If we added a notion of "type" to the Room, and possibly created subclasses thereof, we could
+even combine some map-based movement (grid rooms) with story/corridor (text adventure rooms)
+by simply linking the two of them together. This may not actually be a crazy idea, as it would
+allow simple transitions with explanatory text before entering a dungeon, for example.
+
+We may wish to consider the possibility of also displaying some "always on" or "nearly always on"
+bits of content in addition to the room itself. For example, player inventory or perhaps player
+stats of some kind. Those could be as a header or a footer to the room content. Perhaps rooms
+would opt in/out of displaying this as part of their configuration?
+
+NPCs would be some work, but we could imagine that their notion of "time" only advances when the
+player makes moves. Fast enemies move every player move (and possibly multiple cells) while slow
+enemies may stay in place for several player moves. Not clear if/how combat would work in this
+type of a scenario, although possibly something akin to a turn-based JRPG could be made to work
+relatively simply - player selects their action, then NPC gets a turn, etc.
+
+Project Plan
+------------
+
+This is a roughly ordered collection of ideas about how I think we would want to approach the
+items discussed in Project Notes above. There is definitely room for interpretation on how this
+should be done, but I've at least made some attempt to order things based on dependencies.
+
+ 1. Add support for images to Room contents. Make a couple of examples to demonstrate.
+ 2. Add support for Room objects in YAML to have types, unlocking subtypes for rooms.
+ 3. Make a mock-up (in plain HTML) of a gridded image series.
+ 4. Add a GridRoom subclass an link it to the grid type. These are image grids. Make an example.
+ 5. Adjust HTML generation to support interstitial links (preferably POST!) to support clickable image grids.
+ 6. Incorporate the concept of the hero position for the GridRoom class. Associate with an image. Make an example.
+ 7. Add an Item class. These can have position in a GridRoom and an associated image.
+ 8. Allow defining Items in a GridRoom in YAML. Make an example.
