@@ -74,6 +74,7 @@ we can make progress:
    * What does main.py do?
    * How are areas in the game organized (what classes)? In which file(s) do you find that code?
    * What does the Session class do?
+     * With the basic overview of the Session class in mind, what do the rest of the session methods do?
    * What does the Handler class do?
    * Where is most of the "interesting" functionality handled (class and file)?
    * Where do you find an example set of game data?
