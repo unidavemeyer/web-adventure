@@ -134,10 +134,33 @@ items discussed in Project Notes above. There is definitely room for interpretat
 should be done, but I've at least made some attempt to order things based on dependencies.
 
  1. Add support for images to Room contents. Make a couple of examples to demonstrate.
+    * Mentor will add image support -- seems like it would have nuance that may be tricky.
  2. Add support for Room objects in YAML to have types, unlocking subtypes for rooms.
+    * Initially just have this as a property on the Room class, serialized in from YAML
+    * Decide if this is a required property or not (both have advantages)
  3. Make a mock-up (in plain HTML) of a gridded image series.
- 4. Add a GridRoom subclass an link it to the grid type. These are image grids. Make an example.
+    * Ideally, can test image support by doing this as the contents of a Room in YAML as well
+    * Will involve making some additional image contents (at least placeholder quality)
+ 4. Add a GridRoom subclass and link it to the grid type. These are image grids. Make an example.
+    * Note that this will definitely be a subclass, so it will inherit much behavior from Room
+    * May need to adjust the load method to support pre-pulling room properties and then determining proper class to instantiate
+    * Will want to carefully consider authoring model here - perhaps "text bitmap" with lookup table (like an indexed image?)
+    * Can/should we support more than just rectangular grids?
  5. Adjust HTML generation to support interstitial links (preferably POST!) to support clickable image grids.
+    * Some reading on the subject suggests we may need to incorporate JavaScript to make this work, which is fine
  6. Incorporate the concept of the hero position for the GridRoom class. Associate with an image. Make an example.
+    * May also consider if/how exits would manipulate this for entry to other GridRooms
  7. Add an Item class. These can have position in a GridRoom and an associated image.
  8. Allow defining Items in a GridRoom in YAML. Make an example.
+
+Daily Plans
+-----------
+ 1. 2022-03-31: (unlikely all of these will be accomplished, but listing out thoughts)
+    * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
+    * Discuss possibility of getting git client installed on school laptop
+    * Continue to answer questions from the Initial Work section, starting with further detail on the additional
+      Session class methods and continuing from there
+    * Download copies of relevant code (ideally git, but can just download directly if git is not present)
+    * Make adjustments (quite possibly with Mentor help!) to get local copy of the project running
+    * Adjust or make own version of game content YAML and run it to gain familiarity with the authoring model
+    * Start developing a plan for how to do Project Plan item (2)
