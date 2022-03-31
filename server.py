@@ -84,6 +84,8 @@ class Handler(Hs.BaseHTTPRequestHandler):
 class Server:
     """High level wrapper for the http server, tracking various important bits"""
 
+    s_strPathImage = '/image'
+
     def __init__(self):
         self.m_rooms = None
         self.m_group = None
@@ -106,6 +108,7 @@ class Server:
                 "/create" : self.OnGetCreate,
                 "/favicon.ico" : self.OnGetFavicon,
                 "/login" : self.OnGetLogin,
+                self.s_strPathImage : self.OnGetImage,
                 }
 
     def SetRooms(self, rooms):
@@ -173,8 +176,19 @@ class Server:
         fn = self.m_mpPathGet.get(handler.path)
         if fn is not None:
             fn(handler)
-        else:
-            self.OnRedirectLogin(handler)
+            return
+
+        # For images, we want to allow effectively doing direct file mapping, which means the path
+        #  won't actually match the entirety in the dictionary
+
+        if handler.path.startswith(self.s_strPathImage + '/'):
+            fn = self.m_mpPathGet.get(self.s_strPathImage)
+            fn(handler)
+            return
+
+        # If nothing else handled this request, redirect to login
+
+        self.OnRedirectLogin(handler)
 
     def OnRedirectLogin(self, handler):
         # generate 303 return sending people to GET the /login endpoint
@@ -457,6 +471,52 @@ class Server:
 
         handler.send_response(404)
         handler.end_headers()
+
+    def OnGetImage(self, handler):
+        """Support providing images"""
+
+        # Get the relative path to the image (will be relative to the data directory)
+
+        strPathImage = handler.path[len(self.s_strPathImage) + 1:]
+
+        # See if the image exists -- if not, that's a 404
+
+        if not os.path.exists(strPathImage):
+            handler.send_response(404)
+            handler.end_headers()
+            return
+
+        # Determine particular image type -- we support png, jpeg, and gif for now
+
+        s_mpStrExtStrContent = {
+                '.gif' : 'image/gif',
+                '.jpeg' : 'image/jpeg',
+                '.jpg' : 'image/jpeg',
+                '.png' : 'image/png',
+            }
+
+        strExt = os.path.splitext(strPathImage)[-1]
+        strContent = s_mpStrExtStrContent.get(strExt.lower(), None)
+
+        if strContent is None:
+            handler.send_response(404)
+            handler.end_headers()
+            return
+
+        # Load up the image data
+
+        # BB (davidm) any kind of error handling we want here?
+
+        with open(strPathImage, 'rb') as fileIn:
+            aBImage = fileIn.read()
+
+        # Send a successful response with the image content
+
+        handler.send_response(200)
+        handler.send_header('Content-type', strContent)
+        handler.send_header('Content-Length', len(aBImage))
+        handler.end_headers()
+        handler.wfile.write(aBImage)
 
     def FormExample(self, handler, lPart):
         """Example of doing form stuff, useful while experimenting with things"""

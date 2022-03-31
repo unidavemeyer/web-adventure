@@ -133,8 +133,8 @@ This is a roughly ordered collection of ideas about how I think we would want to
 items discussed in Project Notes above. There is definitely room for interpretation on how this
 should be done, but I've at least made some attempt to order things based on dependencies.
 
- 1. Add support for images to Room contents. Make a couple of examples to demonstrate.
-    * Mentor will add image support -- seems like it would have nuance that may be tricky.
+ 1. ~~Add support for images to Room contents. Make a couple of examples to demonstrate.~~
+    * ~~Mentor will add image support -- seems like it would have nuance that may be tricky.~~
  2. Add support for Room objects in YAML to have types, unlocking subtypes for rooms.
     * Initially just have this as a property on the Room class, serialized in from YAML
     * Decide if this is a required property or not (both have advantages)

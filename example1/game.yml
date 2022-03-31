@@ -1,6 +1,7 @@
 ---
 name: Starting Room
-desc: You are standing in the starting area!
+desc: You are standing in the starting area! Here is an image
+  <img src="image/sample.png"/> for you to look at.
 exits:
   - name: Left Room
     verb: Go left!
@@ -82,6 +83,7 @@ exits:
 name: End Room
 desc: Sneaking past the now empty Right Room to avoid triggering the trap that makes
   more monsters appear, you made your way to the end of the adventure. Rejoice!
+  <img src="image/sample.png">
 exits:
   - name: End Room
     verb: Loop forever!
