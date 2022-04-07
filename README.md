@@ -155,7 +155,7 @@ should be done, but I've at least made some attempt to order things based on dep
 
 Daily Plans
 -----------
- 1. 2022-07-07: (unlikely all of these will be accomplished, but listing out thoughts)
+ 1. 2022-04-07: (unlikely all of these will be accomplished, but listing out thoughts)
     * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
     * Discuss possibility of getting git client installed on school laptop
     * Continue to answer questions from the Initial Work section, starting with further detail on the additional
