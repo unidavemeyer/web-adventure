@@ -155,14 +155,14 @@ should be done, but I've at least made some attempt to order things based on dep
 
 Daily Plans
 -----------
- 1. 2022-03-31: (unlikely all of these will be accomplished, but listing out thoughts)
+ 1. 2022-07-07: (unlikely all of these will be accomplished, but listing out thoughts)
     * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
     * Discuss possibility of getting git client installed on school laptop
     * Continue to answer questions from the Initial Work section, starting with further detail on the additional
       Session class methods and continuing from there
     * Download copies of relevant code (ideally git, but can just download directly if git is not present)
     * Make adjustments (quite possibly with Mentor help!) to get local copy of the project running
+    * Run program (main.py) and use browser to go to http://localhost:8000 to interact
     * Adjust or make own version of game content YAML and run it to gain familiarity with the authoring model
     * Look at a set of changes in github - try the one for image support, report on image formats that are supported
-    * Run program (main.py) and use browser to go to http://localhost:8000
     * Start developing a plan for how to do Project Plan item (2)
