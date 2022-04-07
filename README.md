@@ -163,4 +163,6 @@ Daily Plans
     * Download copies of relevant code (ideally git, but can just download directly if git is not present)
     * Make adjustments (quite possibly with Mentor help!) to get local copy of the project running
     * Adjust or make own version of game content YAML and run it to gain familiarity with the authoring model
+    * Look at a set of changes in github - try the one for image support, report on image formats that are supported
+    * Run program (main.py) and use browser to go to http://localhost:8000
     * Start developing a plan for how to do Project Plan item (2)
