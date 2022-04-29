@@ -181,14 +181,13 @@ Daily Plans
       * Goal: understand how the YAML file provides what the player sees in the browser, what their options are, etc.
     * Start developing a plan for how to do Project Plan item (2)
       * Goal: get started on the changes necessary to make our high level goal a reality
- 1. 2022-04-28:
+ 1. 2022-05-05:
     * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
-    * Discuss results for a git client
-    * Continue to answer questions from the Initial Work section, starting with what happens when someone clicks a link
-      Session class methods and continuing from there
-      * Goal: become familiar with the workings of the project so you know kind of where things are and how they work together
     * Make adjustments (quite possibly with Mentor help!) to get local copy of the project running
       * Need to get YAML library into working state (mentor to provide helper code for this)
+    * Discuss status for a git client installation
+    * Continue to answer questions from the Initial Work section, starting with what happens when someone clicks a link
+      * Goal: become familiar with the workings of the project so you know kind of where things are and how they work together
     * Run program (main.py) and use browser to go to http://localhost:8000 to interact
       * Goal: demonstrate full functionality, so that we're ready to start making changes and testing them out
     * Adjust or make own version of game content YAML and run it to gain familiarity with the authoring model
