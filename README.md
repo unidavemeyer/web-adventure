@@ -138,6 +138,7 @@ should be done, but I've at least made some attempt to order things based on dep
  2. Add support for Room objects in YAML to have types, unlocking subtypes for rooms.
     * Initially just have this as a property on the Room class, serialized in from YAML
     * Decide if this is a required property or not (both have advantages)
+    * See class Room and class Rooms, the Load function in both of those cases, for where to start
  3. Make a mock-up (in plain HTML) of a gridded image series.
     * Ideally, can test image support by doing this as the contents of a Room in YAML as well
     * Will involve making some additional image contents (at least placeholder quality)
@@ -201,6 +202,7 @@ Daily Plans
     * Start developing a plan for how to do Project Plan item (2)
       * Goal: get started on the changes necessary to make our high level goal a reality
       * Goal: get familiar with making some basic python code changes to the project
+      * Once code has been adjusted, should review with mentor to get feedback and make further adjustments
     * Start making a proof-of-concept HTML page as per Project Plan item (3)
       * Goal: demonstrate how an image grid would be authored and interpreted properly by a browser
       * Goal: generate some initial image assets for use with the project
