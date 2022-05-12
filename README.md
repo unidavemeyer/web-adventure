@@ -148,6 +148,8 @@ should be done, but I've at least made some attempt to order things based on dep
     * Can/should we support more than just rectangular grids?
  5. Adjust HTML generation to support interstitial links (preferably POST!) to support clickable image grids.
     * Some reading on the subject suggests we may need to incorporate JavaScript to make this work, which is fine
+    * Alternatively, could/should we support arrow key navigation on the keyboard?
+      * Mentor to investigate topics here and provide useful links
  6. Incorporate the concept of the hero position for the GridRoom class. Associate with an image. Make an example.
     * May also consider if/how exits would manipulate this for entry to other GridRooms
  7. Add an Item class. These can have position in a GridRoom and an associated image.
@@ -183,14 +185,23 @@ Daily Plans
       * Goal: get started on the changes necessary to make our high level goal a reality
  1. 2022-05-05:
     * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
-    * Make adjustments (quite possibly with Mentor help!) to get local copy of the project running
+    * ~~Make adjustments (quite possibly with Mentor help!) to get local copy of the project running~~
       * Need to get YAML library into working state (mentor to provide helper code for this)
-    * Discuss status for a git client installation
-    * Continue to answer questions from the Initial Work section, starting with what happens when someone clicks a link
+    * ~~Discuss status for a git client installation~~
+    * ~~Continue to answer questions from the Initial Work section, starting with what happens when someone clicks a link~~
       * Goal: become familiar with the workings of the project so you know kind of where things are and how they work together
-    * Run program (main.py) and use browser to go to http://localhost:8000 to interact
+    * ~~Run program (main.py) and use browser to go to http://localhost:8000 to interact~~
       * Goal: demonstrate full functionality, so that we're ready to start making changes and testing them out
-    * Adjust or make own version of game content YAML and run it to gain familiarity with the authoring model
+    * ~~Adjust or make own version of game content YAML and run it to gain familiarity with the authoring model~~
       * Goal: understand how the YAML file provides what the player sees in the browser, what their options are, etc.
     * Start developing a plan for how to do Project Plan item (2)
       * Goal: get started on the changes necessary to make our high level goal a reality
+ 1. 2022-05-12:
+    * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
+    * Start developing a plan for how to do Project Plan item (2)
+      * Goal: get started on the changes necessary to make our high level goal a reality
+      * Goal: get familiar with making some basic python code changes to the project
+    * Start making a proof-of-concept HTML page as per Project Plan item (3)
+      * Goal: demonstrate how an image grid would be authored and interpreted properly by a browser
+      * Goal: generate some initial image assets for use with the project
+      * Goal: provide a target for implementation for Project Plan item (4)
