@@ -215,6 +215,14 @@ class Session:
         rooms = server.g_server.m_rooms
         roomNext = rooms.Room(dest)
 
+        # provide some debug output for what's going on
+
+        handler.log_message(
+                    "Moving from room '{start}' to '{finish}' {legit}".format(
+                        start=self.RoomCur().m_name,
+                        finish=dest,
+                        legit='(valid)' if roomNext else '(invalid)'))
+
         if roomNext:
             self.RunChanges(roomNext)
             self.SetRoomCur(roomNext)
@@ -353,6 +361,10 @@ class Session:
         handler.end_headers()
 
         handler.wfile.write(abOut)
+
+        # provide debug output for what's going on
+
+        handler.log_message("Rendered room '{name}'".format(name=room.m_name))
 
 class Group:
     """All of the sessions known by the system"""

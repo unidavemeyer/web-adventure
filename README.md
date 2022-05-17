@@ -207,3 +207,20 @@ Daily Plans
       * Goal: demonstrate how an image grid would be authored and interpreted properly by a browser
       * Goal: generate some initial image assets for use with the project
       * Goal: provide a target for implementation for Project Plan item (4)
+ 1. 2022-05-19:
+    * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
+    * Start developing a plan for how to do Project Plan item (2)
+      * Goal: get familiar with making some basic python code changes to the project
+      * Goal: get started on the python changes necessary to make our high level goal a reality
+      * Once code has been adjusted, should review with mentor to get feedback and make further adjustments
+    * Start making a proof-of-concept HTML page as per Project Plan item (3)
+      * Goal: demonstrate how an image grid would be authored and interpreted properly by a browser
+      * Goal: generate some initial image assets for use with the project
+      * Goal: provide an HTML target page for implementation for Project Plan item (4)
+      * Once HTML page has been created, should review with mentor to get feedback and make adjustments
+    * Start writing python code for GridRoom class (Project Plan item 4)
+      * Goal: write python code to interpret type added for Project Plan item 2
+      * Goal: write python code that can generate something like the HTML example from Project Plan item 3
+      * Goal: understand how to add a new class to python (as a subclass of another)
+      * Goal: come up with a consistent/simple method to author image grids in the YAML document
+      * Once code has been added and adjusted, should review with mentor to get feedback and make further adjustments
