@@ -212,6 +212,7 @@ Daily Plans
     * Start developing a plan for how to do Project Plan item (2)
       * Goal: get familiar with making some basic python code changes to the project
       * Goal: get started on the python changes necessary to make our high level goal a reality
+      * Goal: demonstrate type is understood by adding to trace output message
       * Once code has been adjusted, should review with mentor to get feedback and make further adjustments
     * Start making a proof-of-concept HTML page as per Project Plan item (3)
       * Goal: demonstrate how an image grid would be authored and interpreted properly by a browser
