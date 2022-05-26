@@ -227,6 +227,10 @@ Daily Plans
       * Once code has been added and adjusted, should review with mentor to get feedback and make further adjustments
  1. 2022-05-26:
     * Contact Mentor once setup and ready to proceed in the morning for start-of-day discussion
+    * Consider alternative plan for the day
+      * Full grid room support looks sizeable vs. current level of experience
+      * Adding type read & report is a good thing to do first, for actual code change experience
+      * After, could consider a model to add additional content instead (e.g., image plus a couple more rooms, for example)
     * Start developing a plan for how to do Project Plan item (2)
       * Goal: get familiar with making some basic python code changes to the project
       * Goal: get started on the python changes necessary to make our high level goal a reality
