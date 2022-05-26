@@ -344,6 +344,9 @@ class Session:
         # Note that we pass the var/val dictionary here for formatting purposes in case the
         #  description wants to include things about current session state
 
+        # HINT: if we make a Desc() function on the room, we can make it be smart about returning
+        #  text for regular rooms and the right divs and such for grids
+
         lStr.append('<p>{desc}</p>'.format(desc=self.StrFormatSmart(room.m_desc)))
 
         for exit in room.LExit():
@@ -363,6 +366,9 @@ class Session:
         handler.wfile.write(abOut)
 
         # provide debug output for what's going on
+
+        # HINT: should be able to make a fairly simple adjustment to this to show the type of room in addition
+        #  to its name
 
         handler.log_message("Rendered room '{name}'".format(name=room.m_name))
 

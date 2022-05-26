@@ -18,6 +18,15 @@ class Room:
         self.m_lExit = doc.get('exits')
         self.m_lChange = doc.get('changes', [])
 
+        # HINT: expect something like the lines above for the room to know its type
+
+        # HINT: if we have a grid type room, we may also want to load in the template
+        #  html page data from its file here, and store it for future use in a Desc()
+        #  function/def on the Room class
+
+        # HINT: for grid rooms, the desc field may be another dictionary instead of a
+        #  string, so that we could have the layout and the image references
+
     def StrErrors(self):
         lStrErr = []
 
@@ -26,6 +35,9 @@ class Room:
 
         if self.m_desc is None:
             lStrErr.append("Room {r} is missing desc".format(r=self.m_name))
+
+        # HINT: if this is a grid room, we should verify that self.m_desc has the
+        #  fields we expect, with appropriate contents, etc.
 
         if self.m_lExit is None:
             lStrErr.append("Room {r} is missing exits".format(r=self.m_name))
@@ -47,6 +59,12 @@ class Room:
     def LChange(self):
         return self.m_lChange
 
+    # HINT: this is where we could add a Desc() function/def, which:
+    #  for non-grid rooms would return self.m_desc
+    #  for grid rooms would:
+    #    create divs with content from self.m_desc
+    #    put those divs into the template
+    #    return the combined template/divs as the page content
 
 class Rooms:
     """Stores information about the whole room layout"""
